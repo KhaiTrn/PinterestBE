@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model comments {
+  comment_id Int       @id @default(autoincrement())
+  user_id    Int
+  image_id   Int
+  content    String?   @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  update_at  DateTime? @default(now()) @db.Timestamp(0)
+  users      users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_1")
+  images     images    @relation(fields: [image_id], references: [image_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_2")
+
+  @@index([image_id], map: "image_id")
+  @@index([user_id], map: "user_id")
+}
+
+model images {
+  image_id     Int            @id @default(autoincrement())
+  user_id      Int
+  image_name   String?        @db.VarChar(255)
+  image        String?        @db.VarChar(255)
+  created_at   DateTime?      @default(now()) @db.Timestamp(0)
+  update_at    DateTime?      @default(now()) @db.Timestamp(0)
+  title        String?        @db.VarChar(255)
+  description  String?        @db.VarChar(255)
+  comments     comments[]
+  users        users          @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "images_ibfk_1")
+  saved_images saved_images[]
+
+  @@index([user_id], map: "user_id")
+}
+
+model users {
+  user_id      Int            @id @default(autoincrement())
+  full_name    String         @db.VarChar(255)
+  age          Int?
+  email        String         @db.VarChar(255)
+  password     String?        @db.VarChar(255)
+  avatar       String?        @db.VarChar(255)
+  gooogle_id   String?        @db.VarChar(255)
+  faceboook_id String?        @db.VarChar(255)
+  face_app_id  String?        @db.VarChar(255)
+  created_at   DateTime?      @default(now()) @db.Timestamp(0)
+  update_at    DateTime?      @default(now()) @db.Timestamp(0)
+  comments     comments[]
+  images       images[]
+  saved_images saved_images[]
+}
+
+model saved_images {
+  saved_id Int       @id @default(autoincrement())
+  user_id  Int
+  image_id Int
+  saved_at DateTime? @default(now()) @db.Timestamp(0)
+  users    users     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "saved_images_ibfk_1")
+  images   images    @relation(fields: [image_id], references: [image_id], onDelete: Cascade, onUpdate: NoAction, map: "saved_images_ibfk_2")
+
+  @@unique([user_id, image_id], map: "unique_user_image")
+  @@index([image_id], map: "image_id")
+}
