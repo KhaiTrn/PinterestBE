@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ImageService } from './image.service';
 import { CreateImageDto } from './dto/create-image.dto';
