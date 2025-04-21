@@ -9,21 +9,26 @@ import {
   Query,
   Put,
   UseInterceptors,
+  UploadedFile,
+  Req,
 } from '@nestjs/common';
 import { ImageService } from './image.service';
 import { CreateImageDto } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
-import { ApiAcceptedResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { ResponseSuccess } from 'src/decorators/response-success.decorator';
+import {
+  ApiAcceptedResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+} from '@nestjs/swagger';
+import { ResponseSuccess } from 'src/common/decorators/response-success.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import uploadLocal from 'src/common/multer/local.multer';
 @ApiBearerAuth()
 @Controller('image')
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
-
-  @Post()
-  create(@Body() createImageDto: CreateImageDto) {
-    return this.imageService.create(createImageDto);
-  }
 
   @Get()
   findAll() {
@@ -40,14 +45,52 @@ export class ImageController {
     return result;
   }
 
+  @Post(`upload-local`)
+  @UseInterceptors(FileInterceptor('image', uploadLocal))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+        title: { type: 'string', format: 'Body' },
+        description: { type: 'string' },
+      },
+    },
+  })
+  async uploadLocal(
+    @UploadedFile() file,
+    @Query() query: any,
+    @Body() createImageDto: CreateImageDto,
+    @Req() req: any,
+  ) {
+    return await this.imageService.uploadLocal(file, createImageDto, req);
+  }
+  @Post(`upload-cloud`)
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadCloud(
+    @UploadedFile() file,
+    @Body() createImageDto: CreateImageDto,
+    @Req() req: any,
+  ) {
+    return await this.imageService.uploadCloud(file, createImageDto, req);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.imageService.findOne(+id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateImageDto: UpdateImageDto) {
-    return this.imageService.update(+id, updateImageDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateImageDto: UpdateImageDto,
+  ) {
+    console.log(updateImageDto);
+    return await this.imageService.update(+id, updateImageDto);
   }
 
   @ResponseSuccess('xóa dữ liêu thành công')

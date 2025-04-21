@@ -7,7 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { RES_SUCCESS } from 'src/decorators/response-success.decorator';
+import { RES_SUCCESS } from 'src/common/decorators/response-success.decorator';
 
 // hàm đóng gói ResponseSuccess để trả về đúng format
 export const ResponseSuccess = (
@@ -20,7 +20,7 @@ export const ResponseSuccess = (
     status: 'success',
     code: code,
     message: message,
-    metadata: metadata,
+    content: metadata,
     doc: `api.domain.com/doc`,
   };
 };

@@ -1,7 +1,7 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
-import { ACCESS_TOKEN_SECRET } from 'src/constant/app.constant';
+import { ACCESS_TOKEN_SECRET } from 'src/common/constant/app.constant';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 
 @Injectable()

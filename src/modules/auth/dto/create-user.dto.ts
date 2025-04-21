@@ -1,14 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, isEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto {
-  @ApiProperty()
-  @IsEmail()
+  @IsEmail({}, { message: 'email không hợp lệ' })
   @IsString()
   email: string;
 
-  @ApiProperty()
-  @IsString()
+  @IsString({ message: `trường password phải có` })
   password: string;
-  fullname: string;
+  @IsOptional()
+  @ApiProperty({ required: false })
+  fullname?: string;
 }

@@ -11,3 +11,4 @@ export const REGEX_EMAIL =
 export const CLOUD_NAME = process.env.CLOUD_NAME;
 export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 export const CLOUDINARY_SECRET_KEY = process.env.CLOUDINARY_SECRET_KEY;
+export const BASE_URL = process.env.BASE_URL;

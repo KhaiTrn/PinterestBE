@@ -7,9 +7,21 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { CheckTokenStategy } from './modules/auth/token/token-stategy';
 import { ImageModule } from './modules/image/image.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
-  imports: [ConfigModule.forRoot(), PrismaModule, AuthModule, UserModule, ImageModule],
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'upload'),
+      serveRoot: '/upload',
+    }),
+    ConfigModule.forRoot(),
+    PrismaModule,
+    AuthModule,
+    UserModule,
+    ImageModule,
+  ],
   controllers: [AppController],
   providers: [AppService, CheckTokenStategy],
 })

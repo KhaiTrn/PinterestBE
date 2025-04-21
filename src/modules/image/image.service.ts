@@ -1,14 +1,91 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateImageDto } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { contains } from 'class-validator';
-
+import {
+  BASE_URL,
+  CLOUD_NAME,
+  CLOUDINARY_API_KEY,
+  CLOUDINARY_SECRET_KEY,
+} from 'src/common/constant/app.constant';
+import { v2 as cloudinary } from 'cloudinary';
+import { error } from 'console';
+import { resolve } from 'path';
 @Injectable()
 export class ImageService {
   constructor(private prisma: PrismaService) {}
-  create(createImageDto: CreateImageDto) {
-    return 'This action adds a new image';
+  async uploadLocal(file, createImageDto, req) {
+    if (!file)
+      throw new BadRequestException(
+        'Vui lòng upload file đúng định dạng với key(form-data)',
+      );
+    let { title, description } = createImageDto;
+    title = title ? title : '';
+    description = description ? description : '';
+    const { user } = req;
+    const imgUrl = `${BASE_URL}/upload/${file.filename}`;
+    const fileNew = await this.prisma.images.create({
+      data: {
+        user_id: user.user_id,
+        image: imgUrl,
+        title,
+        description,
+      },
+      select: {
+        image: true,
+        title: true,
+        description: true,
+        created_at: true,
+      },
+    });
+    return fileNew;
+  }
+
+  async uploadCloud(file, createImageDto, req) {
+    if (!file)
+      throw new BadRequestException(
+        'Vui lòng upload file đúng định dạng với key(form-data)',
+      );
+    const { user } = req;
+    let { title, description } = createImageDto;
+    title = title ? title : '';
+    description = description ? description : '';
+    // Configuration
+    cloudinary.config({
+      cloud_name: CLOUD_NAME,
+      api_key: CLOUDINARY_API_KEY,
+      api_secret: CLOUDINARY_SECRET_KEY, // Click 'View API Keys' above to copy your API secret
+    });
+
+    // Upload an image
+    const uploadResult: any = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream({ folder: 'images1' }, (error, result) => {
+          if (error) return reject(error);
+          return resolve(result);
+        })
+        .end(file.buffer);
+    });
+    console.log(uploadResult);
+    const imageNew = this.prisma.images.create({
+      data: {
+        user_id: user.user_id,
+        image: uploadResult.secure_url,
+        image_name: uploadResult.display_name,
+        title,
+        description,
+      },
+      select: {
+        image: true,
+        image_id: true,
+        image_name: true,
+        title,
+        description,
+        created_at: true,
+      },
+    });
+    return imageNew;
   }
 
   async findAll() {
@@ -47,7 +124,7 @@ export class ImageService {
   }
 
   async update(id: number, updateImageDto: UpdateImageDto) {
-    const { image_name, image, title, description } = updateImageDto;
+    let { image_name, image, title, description } = updateImageDto;
     const imageUpdated = await this.prisma.images.update({
       where: { image_id: id },
       data: { image_id: id, image_name, image, title, description },

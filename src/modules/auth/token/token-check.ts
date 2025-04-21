@@ -9,7 +9,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JsonWebTokenError, TokenExpiredError } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { IS_PUBLIC_KEY } from 'src/decorators/is-public.decorator';
+import { IS_PUBLIC_KEY } from 'src/common/decorators/is-public.decorator';
 
 @Injectable()
 export class TokenCheck extends AuthGuard('check-token') {

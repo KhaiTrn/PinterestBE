@@ -13,7 +13,7 @@ import {
   ACCESS_TOKEN_SECRET,
   REFRESH_TOKEN_EXPIRED,
   REFRESH_TOKEN_SECRET,
-} from 'src/constant/app.constant';
+} from 'src/common/constant/app.constant';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +36,7 @@ export class AuthService {
     const hashPassword = bcrypt.hashSync(password, 10);
     const userNew = await this.prisma.users.create({
       data: { email: email, password: hashPassword, full_name: full_name },
-      select: { email: true, full_name: true },
+      select: { email: true },
     });
 
     return userNew;
