@@ -119,12 +119,17 @@ export class ImageService {
   async findOne(id: number) {
     const image = await this.prisma.images.findUnique({
       where: { image_id: id },
+      include: { comments: true },
     });
+    if (!image) {
+      throw new BadRequestException('không tìm thấy image');
+    }
     return image;
   }
 
   async update(id: number, updateImageDto: UpdateImageDto) {
     let { image_name, image, title, description } = updateImageDto;
+    console.log(updateImageDto);
     const imageUpdated = await this.prisma.images.update({
       where: { image_id: id },
       data: { image_id: id, image_name, image, title, description },

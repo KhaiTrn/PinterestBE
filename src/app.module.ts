@@ -9,6 +9,8 @@ import { CheckTokenStategy } from './modules/auth/token/token-stategy';
 import { ImageModule } from './modules/image/image.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CommentsModule } from './modules/comments/comments.module';
+import { FavoritesModule } from './modules/favorites/favorites.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { join } from 'path';
     AuthModule,
     UserModule,
     ImageModule,
+    CommentsModule,
+    FavoritesModule,
   ],
   controllers: [AppController],
   providers: [AppService, CheckTokenStategy],
